@@ -15,14 +15,10 @@ class CalendarsController < ApplicationController
   private
 
   def plan_params
-    params.require(:plan).permit(:date, :plan)
+    params.require(:calendars).permit(:date, :plan)
   end
-  # ここまでがDBの保存のプロセス
 
-
-  # ここからが保存の内容の記述
-  def getWeek
-
+  def get_week
     wdays = ['(日)','(月)','(火)','(水)','(木)','(金)','(土)']
 
     # Dateオブジェクトは、日付を保持しています。下記のように`.today.day`とすると、今日の日付を取得できます。
@@ -31,8 +27,6 @@ class CalendarsController < ApplicationController
 
     @week_days = []
 
-    # whereメソッド
-    #@todays_dateは１つのカレンダー ..@todays_date + 6でそのカレンダーがあと6つあるという意味
     plans = Plan.where(date: @todays_date..@todays_date + 6)
 
     7.times do |x|
@@ -40,15 +34,7 @@ class CalendarsController < ApplicationController
       plans.each do |plan|
         today_plans.push(plan.plan) if plan.date == @todays_date + x
       end
-
-      
-      wday_num = Date.today.wday + x
-      if wday_num >= 7
-        wday_num = wday_num -7
-      end
-
-      days = { :month => (@todays_date + x).month, :date => (@todays_date+x).day, :plans => today_plans, :wdays => wdays[wday_num] }
-
+      days = { month: (@todays_date + x).month, date: (@todays_date+x).day, plans: today_plans}
       @week_days.push(days)
     end
 
